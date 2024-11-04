@@ -1,4 +1,4 @@
-import { Bot, createBot } from "mineflayer";
+import { Bot, createBot, EquipmentDestination } from "mineflayer";
 import { BasePlugin } from "./plugins/BasePlugin";
 import { McfalloutPlugin } from "./plugins/Mcfallout.plugin";
 import { CommanderPlugin } from "./plugins/Commander.plugin";
@@ -36,17 +36,17 @@ export class BaseBot {
     constructor(private _config: BaseBotConfig) {
         ALL[this._config.username] = this;
 
-        this._config.white_list = ['cook1470'];
-
-        this.loadPlugin(new McfalloutPlugin(this));
         this.loadPlugin(new CommanderPlugin(this));
+        this.loadPlugin(new McfalloutPlugin(this));
+
+        this.commanderPlugin.registerCommand('equip', this._equip, this);
     }
 
     /** Mineflayer Bot 物件 */
     get bot(): Bot { return this._bot };
     // 插件
-    get mcfalloutPlugin() { return this.getPlugin(McfalloutPlugin.TYPE) as McfalloutPlugin };
     get commanderPlugin() { return this.getPlugin(CommanderPlugin.TYPE) as CommanderPlugin };
+    get mcfalloutPlugin() { return this.getPlugin(McfalloutPlugin.TYPE) as McfalloutPlugin };
 
     /** 讓 Bot 登入遊戲。 */
     login(): void {
@@ -57,12 +57,13 @@ export class BaseBot {
             password: this._config.password,
             host: 'jp.mcfallout.net',
             auth: 'microsoft',
-            hideErrors: true,
+            hideErrors: true
         })
 
         // 設置監聽器
         bot.once('spawn', this._onSpawn);
         bot.once('end', this._onEnd);
+        bot.once('kicked', this._onKicked);
     }
 
     /** 當 Bot 重生時。 */
@@ -80,7 +81,19 @@ export class BaseBot {
     private _onEnd = (reason: string): void => {
         this._bot = null;
         // 若有設定自動重新連線，則 5 秒後自動重新連線。
-        if (this._config.auto_reconnect) setTimeout(this.login, 5000);
+        if (this._config.auto_reconnect) setTimeout(this.login.bind(this), 5000);
+    }
+
+    /**
+     * 當 Bot 被踢出伺服器時。
+     * @param reason 原因
+     */
+    private _onKicked = (reason: string, loggedIn: boolean): void => {
+        try {
+            console.error('onKicked: ', typeof reason === 'string' ? reason : JSON.stringify(reason));
+        } catch (e) {
+            console.error('onKicked: ', reason);
+        }
     }
 
     end(): void {
@@ -123,5 +136,16 @@ export class BaseBot {
         if (whiteList && !this.checkWhiteList(username)) return;
         if (message.length > 200) message = message.slice(0, 197) + '...'; // 當訊息過長時切斷，避免被踢出伺服器
         this._bot.chat(`/m ${username} ${message}`);
+    }
+
+    // 指令
+
+    // ex. /equip iron_sword hand
+    private _equip = async (username: string, itemCode: string, destination: EquipmentDestination = 'hand'): Promise<void> => {
+        if (!itemCode) return Promise.reject('請輸入物品代碼。例：/equip iron_sword hand');
+        if (!["hand", "head", "torso", "legs", "feet", "off-hand"].includes(destination)) return Promise.reject(`請輸入裝備位置。例：/equip ${itemCode} hand，參數："[hand|head|torso|legs|feet|off-hand]`);
+        const item = this._bot.inventory.slots.find(item => item && item.name === itemCode);
+        if (!item) return Promise.reject('背包中沒有該物品。');
+        await this._bot.equip(item, 'hand').catch(console.error);
     }
 }
