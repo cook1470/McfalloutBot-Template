@@ -1,7 +1,7 @@
 import { Bot } from "mineflayer";
 import { BaseBot } from "../BaseBot";
 
-/** 插件基底 */
+/** 基底插件 */
 export class BasePlugin {
 
     /** 插件類別，每個繼承此類別的插件都需要定義自己的 TYPE。 */
