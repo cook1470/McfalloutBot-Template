@@ -6,11 +6,13 @@ import { BaseBot } from "../BaseBot";
 /** 指令管理器，用於方便管理機器人指令的工具。 */
 export class CommanderPlugin extends BasePlugin {
 
+    static TYPE: string = 'Commander';
+
     private _commandMap: { [key: string]: CommandFunction } = {};
 
     constructor(baseBot: BaseBot) {
         super(baseBot)
-        
+
         // 預設註冊 help 指令。
         this.registerCommand('help', this._help, this);
     }
@@ -43,7 +45,7 @@ export class CommanderPlugin extends BasePlugin {
      * 註冊指令，使玩家可在遊戲中私訊 Bot 使用指令。
      * @param commandName 指令名稱
      * @param fn 要執行的函數
-     * @param context 
+     * @param context 函數的上下文，代表函數從何執行，一般請直接填 this
      */
     registerCommand(commandName: string, fn: CommandFunction, context?: any): void {
         if (this._commandMap[commandName]) console.error(`重複註冊指令：${commandName}`);
