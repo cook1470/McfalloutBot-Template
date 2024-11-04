@@ -1,9 +1,8 @@
 {
-  "name": "mcfallout-bot-c",
-  "version": "1.0.0",
-  "main": "index.js",
+  "name": "mcfalloutbot-template",
+  "version": "0.0.1",
+  "main": "dist/app.js",
   "scripts": {
-    "test": "npx ts-node ./test/test.ts",
     "start": "tsc && node ./dist/app.js"
   },
   "keywords": [],
