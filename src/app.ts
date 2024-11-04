@@ -15,23 +15,23 @@ const configDirPath = path.join(__dirname, 'data');
 
 async function start(): Promise<void> {
 
-    console.log('歡迎使用 廢土機器人-C v0.0.1');
+    console.log('歡迎使用 廢土機器人模板 v0.0.1');
 
     const config = await (async () => {
         try {
             return JSON.parse(await FileUtil.readFile(configPath, configDirPath));
         } catch (e) {
-            console.log('找不到 config.json，請輸入帳號資料：');
+            console.log('找不到 config.json，請輸入機器人帳號資料：');
             const username = await question('帳號: ');
             const config: BaseBotConfig = {
                 username: username,
                 password: await question('密碼: '),
                 auto_reconnect: true,
-                white_list: ['請將此更改為您的 Minecraft ID'],
+                white_list: [await question('白名單（你的玩家 ID）: ')],
             };
             // 儲存設定檔
             FileUtil.writeFile(configPath, JSON.stringify(config, null, 2), configDirPath);
-            console.log(`初次建立設定檔，建議於下方路徑打開設定檔，更改白名單玩家 ID。\n${path.join(configDirPath, configPath)}`);
+            console.log(`初次建立設定檔，已儲存於下方路徑：\n${path.join(configDirPath, configPath)}`);
             return config;
         }
     })()
