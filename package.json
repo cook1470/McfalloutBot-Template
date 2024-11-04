@@ -1,0 +1,16 @@
+{
+  "name": "mcfallout-bot-c",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "npx ts-node ./test/test.ts",
+    "start": "tsc && node ./dist/app.js"
+  },
+  "keywords": [],
+  "author": "酷可",
+  "license": "MIT",
+  "description": "",
+  "dependencies": {
+    "mineflayer": "^4.23.0"
+  }
+}

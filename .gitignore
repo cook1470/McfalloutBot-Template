@@ -1,0 +1,35 @@
+# Node.js modules
+node_modules/
+
+# 環境設定檔
+.env
+.env.local
+.env.*.local
+
+# 編譯輸出的文件
+dist/
+build/
+
+# 日誌檔案
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDE 與編輯器設定
+.vscode/
+.idea/
+.DS_Store
+
+# TypeScript 輸出
+*.js
+*.js.map
+*.d.ts
+
+# 測試報告與 coverage 檔案
+coverage/
+*.lcov
+
+# 其他暫存檔案
+*.log
+*.tmp
+*.swp
