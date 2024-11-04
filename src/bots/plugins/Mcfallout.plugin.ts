@@ -1,14 +1,20 @@
 import { Bot } from "mineflayer";
 import { BasePlugin } from "./BasePlugin";
 import { ChatMessage } from 'prismarine-chat'
+import { BaseBot } from "../BaseBot";
 
-/**
- * ## 廢土伺服器插件
- * 用於處理部分廢土伺服器相關的功能，包含了些許的基礎功能，例如傳送請求、私訊處理等。
- */
+/** 廢土伺服器插件，用於處理部分廢土伺服器相關的功能，包含了些許的基礎功能，例如傳送請求、私訊處理等。 */
 export class McfalloutPlugin extends BasePlugin {
 
     static TYPE: string = 'Mcfallout';
+
+    constructor(baseBot: BaseBot) {
+        super(baseBot);
+
+        baseBot.commanderPlugin.registerCommand('tpMe', this._tpMe, this);
+        baseBot.commanderPlugin.registerCommand('back', this._back, this);
+
+    }
 
     setup = (bot: Bot): void => {
         // 設置監聽器
@@ -28,26 +34,7 @@ export class McfalloutPlugin extends BasePlugin {
             this.tpaccept(/^\[系統\] (.+) 想要你?傳送到 (該玩家|你) 的位置$/.exec(message)[1]);
         }
 
-        // 解析並處理私訊內容
-        if (/^\[(.+)\-> 您] (.+)$/.test(message)) {
-            const match = /^\[(.+)\-> 您] (.+)$/.exec(message);
-            this.onPrivateMessage(match[1], match[2]);
-        }
-
-        console.log(jsonMsg.toAnsi());
-    }
-
-    /**
-     * 當接收到玩家私訊時。
-     * @param username 私訊的玩家 ID
-     * @param message 私訓的內容
-     */
-    private onPrivateMessage(username: string, message: string): void {
-        if (!this.baseBot.checkWhiteList(username)) return;
-
-        if (message === '/tpMe') {
-            this.tpa(username);
-        }
+        console.log(jsonMsg.toAnsi()); // 此行用於顯示遊戲內訊息，如不需要可自行刪除
     }
 
     /** 接受玩家的傳送請求。 */
@@ -63,6 +50,18 @@ export class McfalloutPlugin extends BasePlugin {
     tpa(username: string, whiteList: boolean = false): void {
         if (whiteList && !this.baseBot.checkWhiteList(username)) return;
         this.bot.chat(`/tpa ${username}`);
+    }
+
+    // 指令
+
+    // ex. /tpMe
+    private _tpMe = async (username: string): Promise<void> => {
+        this.tpa(username);
+    }
+
+    // ex. /back
+    private _back = async (username: string): Promise<void> => {
+        this.bot.chat(`/back`);
     }
 
 }
