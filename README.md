@@ -20,6 +20,8 @@ git clone https://github.com/cook1470/McfalloutBot-Template.git
 
 當然除了下載專案以外，你還得要有可以用來撰寫程式的軟體，例如 [Visual Studio Code](https://code.visualstudio.com/)，因為這個專案只是一個模板，僅提供了一些基礎的功能，你可以在這個專案的基礎上建立更多有趣的功能。
 
+## 初始化專案
+
 有了專案之後首先你必須先安裝本專案所使用到的模組們，因為複製出來的專案本身並不包含模組，這是為了節省專案的容量大小，輸入下方指令來安裝模組：
 
 ```bash
@@ -36,6 +38,25 @@ npm install -g typescript
 
 ```bash
 npm start
+```
+
+## 打包成可執行檔
+
+你還可以輸入下列指令來打包你的專案，變成可執行的檔案。
+
+### Window 平台
+```bash
+npm run build
+```
+
+### Mac 平台
+```bash
+npm run build:mac
+```
+
+### Linux 平台
+```bash
+npm run build:linux
 ```
 
 ## 專案簡介
