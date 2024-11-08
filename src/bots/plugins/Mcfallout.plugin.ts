@@ -2,11 +2,14 @@ import { Bot } from "mineflayer";
 import { BasePlugin } from "./BasePlugin";
 import { ChatMessage } from 'prismarine-chat'
 import { BaseBot } from "../BaseBot";
+import { CommanderPlugin } from "./Commander.plugin";
 
 /** 廢土伺服器插件，用於處理部分廢土伺服器相關的功能，包含了些許的基礎功能，例如傳送請求、私訊處理等。 */
 export class McfalloutPlugin extends BasePlugin {
 
     static TYPE: string = 'Mcfallout';
+
+    static DEPENDENCIES: (typeof BasePlugin)[] = [CommanderPlugin];
 
     constructor(baseBot: BaseBot) {
         super(baseBot);
