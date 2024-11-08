@@ -2,6 +2,8 @@ import { Bot, createBot, EquipmentDestination } from "mineflayer";
 import { BasePlugin } from "./plugins/BasePlugin";
 import { McfalloutPlugin } from "./plugins/Mcfallout.plugin";
 import { CommanderPlugin } from "./plugins/Commander.plugin";
+import { PromiseUtil } from "../utils/PromiseUtil";
+import { Window } from 'prismarine-windows';
 
 /** 基底 Bot 設定檔介面 */
 export interface BaseBotConfig {
@@ -138,12 +140,23 @@ export class BaseBot {
         this._bot.chat(`/m ${username} ${message}`);
     }
 
+    /**
+     * 等待任意視窗開啟。
+     * @param loadItem 是否等待視窗至少有一個物品。（主要適用於打開伺服器選單等確定有內容物的視窗）
+     * @param overTiming 超時時間，若有設定，則時間到時回傳，可能為 null
+     * @returns 
+     */
+    waitWindowOpen = async (loadItem: boolean = true, overTiming?: number): Promise<Window | null> => {
+        await PromiseUtil.waitUntil(() => this.bot.currentWindow && (!loadItem || !!this.bot.currentWindow.containerItems().length), 50, overTiming).catch((e) => { });
+        return this.bot.currentWindow;
+    }
+
     // 指令
 
     // ex. /equip iron_sword hand
     private _equip = async (username: string, itemCode: string, destination: EquipmentDestination = 'hand'): Promise<void> => {
         if (!itemCode) return Promise.reject('請輸入物品代碼。例：/equip iron_sword hand');
-        if (!["hand", "head", "torso", "legs", "feet", "off-hand"].includes(destination)) return Promise.reject(`請輸入裝備位置。例：/equip ${itemCode} hand，參數："[hand|head|torso|legs|feet|off-hand]`);
+        if (!["hand", "head", "torso", "legs", "feet", "off-hand"].includes(destination)) return Promise.reject(`請輸入裝備位置。例: /equip ${itemCode} hand，參數："[hand|head|torso|legs|feet|off-hand]`);
         const item = this._bot.inventory.slots.find(item => item && item.name === itemCode);
         if (!item) return Promise.reject('背包中沒有該物品。');
         await this._bot.equip(item, 'hand').catch(console.error);
