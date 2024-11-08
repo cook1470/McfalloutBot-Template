@@ -91,11 +91,14 @@ export class BaseBot {
      * @param reason 原因
      */
     private _onKicked = (reason: string, loggedIn: boolean): void => {
-        try {
-            console.error('onKicked: ', typeof reason === 'string' ? reason : JSON.stringify(reason));
-        } catch (e) {
-            console.error('onKicked: ', reason);
-        }
+        if (typeof reason === 'string') {
+            if (/You are already connected to this proxy!/.test(reason)) {
+                console.error(`${this._config.username} 該帳號的機器人已經在伺服器中，強制關閉自動重新連線。`)
+                this._config.auto_reconnect = false;;
+            } else {
+                console.error('未知的錯誤：\n', reason);
+            }
+        } else console.error('onKicked: ', reason);
     }
 
     end(): void {
