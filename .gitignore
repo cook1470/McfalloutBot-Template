@@ -6,6 +6,9 @@ node_modules/
 .env.local
 .env.*.local
 
+# 設定檔
+config.json
+
 # 編譯輸出的文件
 dist/
 build/
