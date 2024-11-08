@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 
 /** 檔案工具，輔助讀取、寫入檔案。 */
-export class FileUtil {
+export namespace FileUtil {
 
     /**
      * 讀取檔案。
@@ -10,7 +10,7 @@ export class FileUtil {
      * @param dirPath 資料夾路徑
      * @returns 
      */
-    static readFile(filePath: string, dirPath?: string): Promise<string> {
+    export function readFile(filePath: string, dirPath?: string): Promise<string> {
         return new Promise((resolve, reject) => {
             // 如果提供了 dirPath，則將其與 filePath 合併
             const fullPath = dirPath ? path.join(dirPath, filePath) : filePath;
@@ -28,7 +28,7 @@ export class FileUtil {
      * @param content 寫入內容
      * @param dirPath 資料夾路徑
      */
-    static async writeFile(filePath: string, content: string, dirPath?: string): Promise<void> {
+    export async function writeFile(filePath: string, content: string, dirPath?: string): Promise<void> {
         // 如果提供了 dirPath，檢查資料夾是否存在
         if (dirPath) await this.ensureDirectoryExists(dirPath);
 
@@ -50,7 +50,7 @@ export class FileUtil {
      * 確保資料夾存在，若資料夾不存在則自動建立。
      * @param dirPath 資料夾路徑
      */
-    private static ensureDirectoryExists(dirPath: string): Promise<void> {
+    function ensureDirectoryExists(dirPath: string): Promise<void> {
         return new Promise((resolve, reject) => {
             fs.stat(dirPath, (err, stats) => {
                 if (err) {
