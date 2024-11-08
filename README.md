@@ -1,14 +1,20 @@
 # 廢土機器人模板（McfalloutBot-Template）
 
-這是一個用於[廢土伺服器](https://mcfallout.net/)的 Mineflayer 機器人模板，提供了一些基礎的設定檔建立、傳送，以及遊戲內指令管理器，可方便定義各種指令使用。
+這是一個用於 [廢土伺服器](https://mcfallout.net/) 的 [Mineflayer](https://github.com/PrismarineJS/mineflayer) 機器人模板，提供了一些基礎的設定檔建立、傳送，以及遊戲內指令管理器，可方便定義各種指令使用。
 
 ## 如何取得專案
+
+以下簡單介紹兩種可以獲取專案副本的方法。
+
+### 使用 Git 來複製專案
 
 如果你的電腦有安裝 [git](https://git-scm.com/)，那麼你可以在你想要創建專案的地方打開終端機，輸入下方指令將這個專案複製一份到你的電腦。
 
 ```bash
 git clone https://github.com/cook1470/McfalloutBot-Template.git
 ```
+
+### 直接下載專案壓縮檔
 
 如果你沒有安裝 git 也不要緊，只要在這上面找到 `<> Code` 的按鈕，你就可以直接下載這個專案的壓縮檔，解壓縮後同樣可以打開專案。
 
@@ -46,13 +52,13 @@ npm start
 
 除此之外還有兩個較為重要的系統，接下來就來介紹他們。
 
-### 自訂插件（Plugins）
+## 自訂插件（Plugins）
 
-插件系統的基礎類別 BasePlugin（基底插件），這是一個用來繼承的基底類別，僅是提供了一些簡單的屬性，以及介面可供使用，真正的用途在於繼承之後，你可以直接在繼承的子類別內使用 `this.baseBot`、`this.bot` 屬性來操作兩個重點物件，並且在插件類別內複寫 `setup` 函數後，每當機器人進入世界，就會自動執行這個設置函數，用來作為插件的初始化。
+插件系統的基礎類別 `BasePlugin`（基底插件），這是一個用來繼承的基底類別，僅是提供了一些簡單的屬性，以及介面可供使用，真正的用途在於繼承之後，你可以直接在繼承的子類別內使用 `this.baseBot`、`this.bot` 屬性來操作兩個重點物件，並且在插件類別內複寫 `setup` 函數後，每當機器人進入世界，就會自動執行這個設置函數，用來作為插件的初始化。
 
 目前已有兩個預設的插件可供參考、使用，分別是 `McfalloutPlugin` 和 `CommanderPlugin`，前者主要處理廢土伺服器相關的功能，如傳送，後者則是用於管理機器人的指令狀態，方便我們建立指令於遊戲內操作。
 
-以 McfalloutPlugin 為例子：
+以 `McfalloutPlugin` 為例子：
 
 ```typescript
 // 創建新插件時，首先要使用 extends 來繼承 BasePlugin 類別。
@@ -107,11 +113,11 @@ export class BaseBot {
 
 當然，就算你不將插件包裝成屬性，還是可以在能夠讀取 BaseBot 的地方，使用 `baseBot.getPlugin(插件類別.TYPE)` 的方式來進行讀取使用。
 
-### 指令管理器（Commander）
+## 指令管理插件（CommanderPlugin）
 
 這是本專案目前最重要的功能之一，可利用模組化的方式來註冊、管理指令，使得添加新指令的過程更加方便，且內建 /help 指令，供玩家在遊戲中查看所有指令。
 
-首先是當你需要定義指令的時候，以 CommanderPlugin 本身為例。
+首先是當你需要定義指令的時候，以 `CommanderPlugin` 本身為例。
 
 ```typescript
 export class CommanderPlugin extends BasePlugin {
