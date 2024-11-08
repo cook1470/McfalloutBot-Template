@@ -3,13 +3,25 @@
   "version": "0.0.1",
   "main": "dist/app.js",
   "scripts": {
-    "start": "tsc && node ./dist/app.js"
+    "start": "tsc && node ./dist/app.js",
+    "build": "tsc && npx pkg ./dist/app.js -t node18-win-x64 -c package.json -o build/McfalloutBot.exe",
+    "build:mac": "tsc && npx pkg ./dist/app.js -t node18-macos-x64 -c package.json -o build/McfalloutBot.app",
+    "build:linux": "tsc && npx pkg ./dist/app.js -t node18-linux-x64 -c package.json -o build/McfalloutBot-linux"
   },
-  "keywords": [],
+  "keywords": [
+    "Mineflayer",
+    "TypeScript"
+  ],
   "author": "酷可",
   "license": "MIT",
   "description": "",
   "dependencies": {
     "mineflayer": "^4.23.0"
+  },
+  "devDependencies": {
+    "pkg": "^5.8.1"
+  },
+  "pkg": {
+    
   }
 }
