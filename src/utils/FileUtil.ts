@@ -30,7 +30,7 @@ export namespace FileUtil {
      */
     export async function writeFile(filePath: string, content: string, dirPath?: string): Promise<void> {
         // 如果提供了 dirPath，檢查資料夾是否存在
-        if (dirPath) await this.ensureDirectoryExists(dirPath);
+        if (dirPath) await ensureDirectoryExists(dirPath);
 
         return new Promise((resolve, reject) => {
             // 如果提供了 dirPath，則將其與 filePath 合併
