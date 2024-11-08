@@ -43,7 +43,9 @@ async function start(): Promise<void> {
 
 start().catch((reason: any) => {
     console.error(reason);
-    return question('按下 Enter 繼續...');
+    return question('按下 Enter 繼續...').then(() => {
+        rl.close();
+    })
 })
 
 /**
