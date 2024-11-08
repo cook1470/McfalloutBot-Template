@@ -10,8 +10,8 @@ const rl = readline.createInterface({
 })
 
 // 定義設定檔的資料夾路徑。
-const configPath = 'config.json';
-const configDirPath = path.join(__dirname, 'data');
+const configPath = './config.json';
+const dirPath = process.cwd();
 
 async function start(): Promise<void> {
 
@@ -19,7 +19,7 @@ async function start(): Promise<void> {
 
     const config = await (async () => {
         try {
-            return JSON.parse(await FileUtil.readFile(configPath, configDirPath));
+            return JSON.parse(await FileUtil.readFile(configPath, dirPath));
         } catch (e) {
             console.log('找不到 config.json，請輸入機器人帳號資料：');
             const username = await question('帳號: ');
@@ -30,8 +30,8 @@ async function start(): Promise<void> {
                 white_list: [await question('白名單（你的玩家 ID）: ')],
             };
             // 儲存設定檔
-            FileUtil.writeFile(configPath, JSON.stringify(config, null, 2), configDirPath);
-            console.log(`初次建立設定檔，已儲存於下方路徑：\n${path.join(configDirPath, configPath)}`);
+            FileUtil.writeFile(configPath, JSON.stringify(config, null, 2), dirPath);
+            console.log(`初次建立設定檔，已儲存於下方路徑：\n${path.join(dirPath, configPath)}`);
             return config;
         }
     })()
@@ -41,7 +41,10 @@ async function start(): Promise<void> {
 
 }
 
-start();
+start().catch((reason: any) => {
+    console.error(reason);
+    return question('按下 Enter 繼續...');
+})
 
 /**
  * 快速提問。
