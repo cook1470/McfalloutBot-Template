@@ -42,19 +42,19 @@ npm start
 
 ## 打包成可執行檔
 
-你還可以輸入下列指令來打包你的專案，變成可執行的檔案。
+你還可以輸入下列指令來打包你的專案，變成可執行的檔案，根據你電腦的作業系統來選擇。
 
-### Window 平台
+### Window
 ```bash
 npm run build
 ```
 
-### Mac 平台
+### Mac
 ```bash
 npm run build:mac
 ```
 
-### Linux 平台
+### Linux
 ```bash
 npm run build:linux
 ```
