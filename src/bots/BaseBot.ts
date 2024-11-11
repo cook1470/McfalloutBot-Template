@@ -4,6 +4,7 @@ import { McfalloutPlugin } from "./plugins/Mcfallout.plugin";
 import { CommanderPlugin } from "./plugins/Commander.plugin";
 import { PromiseUtil } from "../utils/PromiseUtil";
 import { Window } from 'prismarine-windows';
+import { StringUtil } from "../utils/StringUtil";
 
 /** 基底 Bot 設定檔介面 */
 export interface BaseBotConfig {
@@ -41,6 +42,7 @@ export class BaseBot {
         this.loadPlugin(new CommanderPlugin(this));
         this.loadPlugin(new McfalloutPlugin(this));
 
+        this.commanderPlugin.registerCommand('toss', this._toss, this);
         this.commanderPlugin.registerCommand('equip', this._equip, this);
     }
 
@@ -149,12 +151,81 @@ export class BaseBot {
      * @param overTiming 超時時間，若有設定，則時間到時回傳，可能為 null
      * @returns 
      */
-    waitWindowOpen = async (loadItem: boolean = true, overTiming?: number): Promise<Window | null> => {
+    awaitWindowOpen = async (loadItem: boolean = true, overTiming?: number): Promise<Window | null> => {
         await PromiseUtil.waitUntil(() => this.bot.currentWindow && (!loadItem || !!this.bot.currentWindow.containerItems().length), 50, overTiming).catch((e) => { });
         return this.bot.currentWindow;
     }
 
+    /**
+     * 等待接收訊息，且可設置超時時間。
+     * @param message 要等待的訊息，可傳入純字串或正規表達式。
+     * @param overTiming 最多等待時間，時間到則結束等待，並回傳 reject。
+     * @returns 
+     */
+    awaitMessage(message: string | RegExp, overTiming?: number): Promise<string> {
+        return new Promise<string>((resolve, reject) => {
+            let passed: boolean = false;
+
+            const messageListener = (msg: string): void | Promise<void> => {
+                if (typeof message === 'string') {
+                    if (message !== msg) return;
+                } else if (message instanceof RegExp) {
+                    if (!message.test(msg)) return;
+                }
+                this._bot.off('messagestr', messageListener);
+                resolve(msg); passed = true;
+            };
+
+            this._bot.on('messagestr', messageListener);
+
+            if (typeof overTiming === 'number' && overTiming > 0)
+                PromiseUtil.wait(overTiming).then(() => {
+                    if (passed) return;
+                    this._bot.off('messagestr', messageListener);
+                    reject('time over.');
+                })
+        });
+    }
+
     // 指令
+
+    // ex. /toss * , /toss grass_block , /toss /shulker_box$/
+    private _toss = async (username: string, itemCode: string, _minCount?: string, _slot?: string): Promise<void> => {
+        if (!itemCode) return Promise.reject('請輸入要丟出的物品代碼。例: /toss grass_block、/toss *')
+        if (itemCode !== '*' && !/\/.+\//.test(itemCode) && !this.bot.registry.itemsByName[itemCode]) return Promise.reject(`不存在的物品代碼 => ${itemCode}`)
+        if (_minCount && !StringUtil.isNumberString(_minCount)) return Promise.reject(`請輸入有效的最低數量。例：/toss ${itemCode} 64`);
+        if (_slot && !StringUtil.isNumberString(_slot)) return Promise.reject(`請輸入有效的欄位數字。例：/toss ${itemCode} ${_minCount} 1`);
+
+        /**
+         * 由於玩家在遊戲中使用指令，接收到的內容皆為 string
+         * 對於需要轉型成 number 的參數，建議可以在接收參數前使用 _ 表示
+         * 使用 StringUtil.isNumberString 檢查完內容後（或自行檢查）
+         * 再利用 parseInt、parseFloat 等函數轉換，儲存於新變數中
+         * 可維持程式碼的整潔、統一性。
+         */
+
+        const minCount = _minCount ? parseInt(_minCount) : 1;
+
+        // 準備好正規表達式，用於稍後檢查物品代碼
+        let regexp: RegExp;
+        if (/\/.+\//.test(itemCode)) regexp = new RegExp(itemCode.slice(1, itemCode.length - 1));
+        else regexp = new RegExp(itemCode === '*' ? '.*' : `^${itemCode}$`);
+
+        // 若有指定欄位
+        if (_slot) {
+            const slot = parseInt(_slot);
+            const item = this._bot.inventory.slots[slot];
+            if (regexp.test(item.name) && item.count >= minCount) await this._bot.tossStack(item);
+        } else {
+            // 搜尋玩家庫存所有欄位
+            for (let item of this._bot.inventory.slots) {
+                if (!item) continue;                   // 若不存在物品則跳過
+                if (!regexp.test(item.name)) continue; // 若物品代碼不符合則跳過
+                if (item.count < minCount) continue;   // 若物品數量小於則跳過
+                await this._bot.tossStack(item);
+            }
+        }
+    }
 
     // ex. /equip iron_sword hand
     private _equip = async (username: string, itemCode: string, destination: EquipmentDestination = 'hand'): Promise<void> => {
